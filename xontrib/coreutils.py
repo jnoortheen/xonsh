@@ -15,6 +15,7 @@ tools are cross-platform.
 """
 from xonsh.xoreutils.cat import cat
 from xonsh.xoreutils.echo import echo
+from xonsh.xoreutils.uname import uname
 from xonsh.xoreutils.pwd import pwd
 from xonsh.xoreutils.tee import tee
 from xonsh.xoreutils.tty import tty
@@ -28,4 +29,5 @@ XSH.aliases["echo"] = echo
 XSH.aliases["pwd"] = pwd
 XSH.aliases["tee"] = tee
 XSH.aliases["tty"] = tty
+XSH.aliases["uname"] = uname
 XSH.aliases["yes"] = yes

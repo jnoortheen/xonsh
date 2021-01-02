@@ -304,6 +304,8 @@ class PromptToolkitShell(BaseShell):
             prompt_args["pre_run"] = self.prompt_formatter.start_update
 
         events.on_pre_prompt.fire()
+        if os.environ.get("EXITFIRST"):
+            return "exit"
         line = self.prompter.prompt(**prompt_args)
         events.on_post_prompt.fire()
         return line

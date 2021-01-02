@@ -7,7 +7,7 @@ import os
 import sys
 import subprocess
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 from setuptools.command.sdist import sdist
 from setuptools.command.install import install
 from setuptools.command.develop import develop
@@ -262,6 +262,29 @@ class xdevelop(develop):
         super().install_script(dist, script_name, script_text, dev_path)
 
 
+def build_ext_mods():
+    print("Cythonize mods? ", "CYTHONIZE" in os.environ)
+    if "CYTHONIZE" not in os.environ:
+        return
+
+    try:
+        from Cython.Build import cythonize
+
+        # python setup.py bdist_wheel
+        ext_modules = cythonize(
+            [
+                Extension("xonsh.tokenize", ["xonsh/tokenize.py"]),
+                Extension("xonsh.ply.ply.lex", ["xonsh/ply/ply/lex.py"]),
+                Extension("xonsh.ply.ply.yacc", ["xonsh/ply/ply/yacc.py"]),
+            ],
+            language_level="3",
+            build_dir="build",
+        )
+    except ImportError:
+        ext_modules = None
+    return ext_modules
+
+
 def main():
     """The main entry point."""
     try:
@@ -358,7 +381,7 @@ def main():
         ],
     }
     skw["python_requires"] = ">=3.6"
-    setup(**skw)
+    setup(**skw, ext_modules=build_ext_mods())
 
 
 if __name__ == "__main__":

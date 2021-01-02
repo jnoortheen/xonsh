@@ -81,3 +81,7 @@ xonsh/webconfig/js/app.js
 # mypy
 .dmypy.json
 .mypy_cache
+
+# cython & nuitka
+xonsh/**/*.c
+xonsh/**/*.so

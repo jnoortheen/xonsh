@@ -1,5 +1,8 @@
 """Implements the base xonsh parser."""
-import os
+import sys
+from pathlib import Path
+import pickle
+import pickletools
 import re
 import textwrap
 import time
@@ -245,6 +248,15 @@ def raise_parse_error(
     raise err
 
 
+def bind_callables(parser: yacc.LRParser, module: tp.Optional["BaseParser"]) -> None:
+    parser.errorfunc = module.p_error if module else None
+    for prod in parser.productions:
+        if prod.func and module:
+            prod.callable = getattr(module, prod.func)
+        else:
+            prod.callable = None
+
+
 class YaccLoader(Thread):
     """Thread to load (but not shave) the yacc parser."""
 
@@ -262,13 +274,7 @@ class YaccLoader(Thread):
 class BaseParser:
     """A base class that parses the xonsh language."""
 
-    def __init__(
-        self,
-        yacc_optimize=True,
-        yacc_table="xonsh.parser_table",
-        yacc_debug=False,
-        outputdir=None,
-    ):
+    def __init__(self, yacc_optimize=True, yacc_debug=False, **_):
         """Parameters
         ----------
         yacc_optimize : bool, optional
@@ -480,19 +486,29 @@ class BaseParser:
             debug=yacc_debug,
             start="start_symbols",
             optimize=yacc_optimize,
-            tabmodule=yacc_table,
         )
         if not yacc_debug:
             yacc_kwargs["errorlog"] = yacc.NullLogger()
-        if outputdir is None:
-            outputdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        yacc_kwargs["outputdir"] = outputdir
-        if yacc_debug:
-            # create parser on main thread
-            self.parser = yacc.yacc(**yacc_kwargs)
+
+        t = time.time()
+        parser_cache = Path(__file__).absolute().parent / "parser.tmp.out"
+        if parser_cache.exists():
+            self.parser: yacc.LRParser = pickle.loads(
+                parser_cache.read_bytes(),
+            )
+            print(time.time() - t, "took to load pickle")
+            bind_callables(self.parser, self)
         else:
-            self.parser = None
-            YaccLoader(self, yacc_kwargs)
+            print(
+                "parser-cache not found. Initial load will take some time. ",
+                file=sys.stderr,
+            )
+            self.parser = yacc.yacc(**yacc_kwargs)
+            pickled = pickle.dumps(self.parser, protocol=5)
+            bind_callables(self.parser, None)
+            parser_cache.write_bytes(pickletools.optimize(pickled))
+            bind_callables(self.parser, self)
+        print("loaded parser", time.time() - t)
 
         # Keeps track of the last token given to yacc (the lookahead token)
         self._last_yielded_token = None

@@ -14,6 +14,18 @@ help:
 	* clean: Remove generated files (namely, the amalgamations)
 	""")
 
+.PHONY: xonsh/ply
+xonsh/ply:
+	git remote add ply https://github.com/dabeaz/ply.git
+	git fetch ply
+	git branch ply-branch ply/master
+	git rm -rf xonsh/ply
+	git read-tree --prefix=xonsh/ply/ply -u ply-branch:ply
+	git add xonsh/ply
+	git commit -m "Merged changes from ply to sub-directory"
+	git branch -D ply-branch
+	git remote remove ply
+
 .PHONY: clean
 clean:
 	find xonsh -name __amalgam__.py -delete -print

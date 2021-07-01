@@ -352,13 +352,13 @@ class CompletionContextParser:
             module=self,
             debug=debug,
             optimize=yacc_optimize,
-            tabmodule=yacc_table,
+            # tabmodule=yacc_table,
         )
         if not debug:
             yacc_kwargs["errorlog"] = yacc.NullLogger()
         if outputdir is None:
             outputdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        yacc_kwargs["outputdir"] = outputdir
+        # yacc_kwargs["outputdir"] = outputdir
 
         # create parser on main thread, it's small and should be fast
         self.parser = yacc.yacc(**yacc_kwargs)

@@ -66,6 +66,7 @@ import re
 import types
 import sys
 import inspect
+import cython
 
 # -----------------------------------------------------------------------------
 #                     === User configurable parameters ===
@@ -162,6 +163,8 @@ def format_stack_entry(r) -> str:
 
 
 class YaccSymbol:
+    __slots__ = ("type", "value", "lineno", "endlineno", "lexpos", "endlexpos")
+
     def __str__(self):
         return self.type
 
@@ -792,29 +795,30 @@ class Production(object):
 # -----------------------------------------------------------------------------
 
 
-class LRItem(object):
-    __slots__ = (
-        "name",
-        "prod",
-        "number",
-        "lr_index",
-        "lookaheads",
-        "len",
-        "usyms",
-        "lr_after",
-        "lr_before",
-        "lr_next",
-    )
+@cython.cclass
+class LRItem:
+    # __slots__ = (
+    #     "name",
+    #     "prod",
+    #     "number",
+    #     "lr_index",
+    #     "lookaheads",
+    #     "len",
+    #     "usyms",
+    #     "lr_after",
+    #     "lr_before",
+    #     "lr_next",
+    # )
 
     def __init__(self, p, n):
-        self.name = p.name
+        self.name: cython.p_char = p.name
         prod = list(p.prod)
-        self.number = p.number
-        self.lr_index = n
+        self.number: cython.short = p.number
+        self.lr_index: cython.short = n
         self.lookaheads = {}
         prod.insert(n, ".")
         self.prod = tuple(prod)
-        self.len = len(self.prod)
+        self.len: cython.short = len(self.prod)
         self.usyms = p.usyms
 
     def __str__(self):

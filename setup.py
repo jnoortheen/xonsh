@@ -278,9 +278,9 @@ else:
 
 def build_ext_mods():
     modules = [
-        "xonsh.tokenize",
-        "xonsh.color_tools",
-        "xonsh.ansi_colors",
+        # "xonsh.tokenize",
+        # "xonsh.color_tools",
+        # "xonsh.ansi_colors",
         "xonsh.ply.ply.yacc",
     ]
     if "CYTHONIZE" in os.environ:

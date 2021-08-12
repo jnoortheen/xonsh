@@ -260,15 +260,37 @@ def bind_callables(parser: yacc.LRParser, module: tp.Optional["BaseParser"]) -> 
 class YaccLoader(Thread):
     """Thread to load (but not shave) the yacc parser."""
 
-    def __init__(self, parser, yacc_kwargs, *args, **kwargs):
+    def __init__(
+        self, parser: "BaseParser", yacc_kwargs: dict, *args, **kwargs
+    ) -> None:
         super().__init__(*args, **kwargs)
+        self.t = time.time()
         self.daemon = True
         self.parser = parser
         self.yacc_kwargs = yacc_kwargs
         self.start()
 
     def run(self):
-        self.parser.parser = yacc.yacc(**self.yacc_kwargs)
+        p = self.parser
+        # todo: name = git-hash
+        parser_cache = (
+            Path(__file__).absolute().parent
+            / f"parser.pickle.{pickle.HIGHEST_PROTOCOL}.out"
+        )
+        if parser_cache.exists():
+            p.parser = pickle.loads(parser_cache.read_bytes())
+            bind_callables(p.parser, p)
+        else:
+            print(
+                "parser-cache not found. Initial load will take some time. ",
+                file=sys.stderr,
+            )
+            p.parser = yacc.yacc(**self.yacc_kwargs)
+            bind_callables(p.parser, None)
+            pickled = pickle.dumps(p.parser, protocol=pickle.HIGHEST_PROTOCOL)
+            parser_cache.write_bytes(pickletools.optimize(pickled))
+            bind_callables(p.parser, p)
+        print("loaded parser", time.time() - self.t)
 
 
 class BaseParser:
@@ -490,25 +512,7 @@ class BaseParser:
         if not yacc_debug:
             yacc_kwargs["errorlog"] = yacc.NullLogger()
 
-        t = time.time()
-        parser_cache = Path(__file__).absolute().parent / "parser.tmp.out"
-        if parser_cache.exists():
-            self.parser: yacc.LRParser = pickle.loads(
-                parser_cache.read_bytes(),
-            )
-            print(time.time() - t, "took to load pickle")
-            bind_callables(self.parser, self)
-        else:
-            print(
-                "parser-cache not found. Initial load will take some time. ",
-                file=sys.stderr,
-            )
-            self.parser = yacc.yacc(**yacc_kwargs)
-            pickled = pickle.dumps(self.parser, protocol=5)
-            bind_callables(self.parser, None)
-            parser_cache.write_bytes(pickletools.optimize(pickled))
-            bind_callables(self.parser, self)
-        print("loaded parser", time.time() - t)
+        YaccLoader(self, yacc_kwargs)
 
         # Keeps track of the last token given to yacc (the lookahead token)
         self._last_yielded_token = None
@@ -544,6 +548,7 @@ class BaseParser:
         self._source = s
         self.lexer.fname = filename
         while self.parser is None:
+            print("parser is accessed")
             time.sleep(0.01)  # block until the parser is ready
         tree = self.parser.parse(input=s, lexer=self.lexer, debug=debug_level)
         if self._error is not None:

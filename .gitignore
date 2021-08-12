@@ -87,6 +87,10 @@ xonsh/webconfig/js/app.js
 # testmon pytest-plugin
 .testmondata
 
+# cython & nuitka
+xonsh/**/*.c
+xonsh/**/*.so
+
 # pdm
 .pdm.toml
 __pypackages__

@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 
-from setuptools import setup
+from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
 from setuptools.command.develop import develop
 from setuptools.command.install import install
@@ -276,6 +276,33 @@ else:
     cmdclass["install_scripts"] = install_scripts_rewrite
 
 
+def build_ext_mods():
+    modules = [
+        "xonsh.tokenize",
+        "xonsh.color_tools",
+        "xonsh.ansi_colors",
+        "xonsh.ply.ply.yacc",
+    ]
+    if "CYTHONIZE" in os.environ:
+        print("compile parser modules using cython")
+        from Cython.Build import cythonize
+
+        # python setup.py bdist_wheel
+        return cythonize(
+            [Extension(mod, [mod.replace(".", "/") + ".py"]) for mod in modules],
+            language_level="3",
+            build_dir="build",
+        )
+    elif "MYPYCIZE" in os.environ:
+        print("compile parser modules using mypyc")
+        from mypyc.build import mypycify
+
+        # python setup.py bdist_wheel
+        return mypycify([mod.replace(".", "/") + ".py" for mod in modules])
+    else:
+        return None
+
+
 def main():
     """The main entry point."""
     try:
@@ -286,9 +313,7 @@ def main():
             print(logo)
     except UnicodeEncodeError:
         pass
-    setup(
-        cmdclass=cmdclass,
-    )
+    setup(cmdclass=cmdclass, ext_modules=build_ext_mods())
 
 
 if __name__ == "__main__":

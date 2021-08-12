@@ -83,6 +83,7 @@ def macutils():
 
 @lazyobject
 def terminal256():
+    # todo: lazy import - this causes some slowdown. so try
     return importlib.import_module("pygments.formatters.terminal256")
 
 

@@ -1340,7 +1340,7 @@ def _monkey_patch_pygments_codes():
 
 @lazyobject
 def XonshTerminal256Formatter():
-
+    # todo: this creates some slowdown. check scalene.c.html
     if (
         ptk_version_info()
         and ptk_version_info() > (2, 0)

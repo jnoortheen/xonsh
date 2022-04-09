@@ -5,7 +5,6 @@ Put a warning comment if it doesn't.
 import os
 from github import Github, PullRequest
 from fnmatch import fnmatch
-import logging
 
 
 def get_added_files(pr: PullRequest.PullRequest):
@@ -44,12 +43,12 @@ def main():
     old_comment = get_old_comment(pr)
 
     if old_comment:
-        logging.info("Found an existing comment from bot")
+        print("Found an existing comment from bot")
         if has_news_added:
-            logging.info("Delete warning from bot, since news items is added.")
+            print("Delete warning from bot, since news items is added.")
 
     if (not has_news_added) and (not old_comment):
-        logging.info("No news item found")
+        print("No news item found")
 
         pr.create_issue_comment(
             """\

@@ -26,9 +26,12 @@ def get_pr_number():
     return int(number)
 
 
-def check_issue_comment(pr: PullRequest.PullRequest):
+def get_old_comment(pr: PullRequest.PullRequest):
     for comment in pr.get_issue_comments():
-        print(comment.user, comment.id)
+        if ("github-actions" in comment.user.login) and (
+            "No news item is found" in comment.body
+        ):
+            return comment
 
 
 def main():
@@ -37,15 +40,19 @@ def main():
     repo = gh.get_repo(os.environ["GITHUB_REPOSITORY"])
     pr = repo.get_pull(get_pr_number())
     has_news_added = check_news_file(pr)
-    check_issue_comment(pr)
+    old_comment = get_old_comment(pr)
 
-    if not has_news_added:
+    if (not has_news_added) and (not old_comment):
         print("No news item found")
 
         pr.create_issue_comment(
-            "Warning! No news item is found. "
-            "If this is user facing change, please add a news item from `news/Template.rst`."
+            """\
+**Warning!** No news item is found for this PR. 
+If this is an user facing change/feature/fix, please add a news item by copying the format from `news/TEMPLATE.rst`.
+"""
         )
+    elif old_comment:
+        old_comment.delete()
 
 
 if __name__ == "__main__":

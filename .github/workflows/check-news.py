@@ -4,7 +4,6 @@ Put a warning comment if it doesn't.
 """
 import os
 from github import Github, PullRequest
-import re
 from fnmatch import fnmatch
 
 
@@ -21,11 +20,10 @@ def check_news_file(pr):
 
 
 def get_pr_number():
-    pattern = re.compile(r"pull/(\d+)/")
-    ref = os.environ["GITHUB_REF"]
-    print(f"{ref=} testing")
-    matches = pattern.findall(ref)
-    return int(matches[0])
+    number = os.environ["PR_NUMBER"]
+    if not number:
+        raise Exception(f"Pull request number is not found `PR_NUMBER={number}")
+    return int(number)
 
 
 def check_issue_comment(pr: PullRequest.PullRequest):

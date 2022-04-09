@@ -22,7 +22,9 @@ def check_news_file(pr):
 
 def get_pr_number():
     pattern = re.compile(r"pull/(\d+)/")
-    matches = pattern.findall(os.environ["GITHUB_REF"])
+    ref = os.environ["GITHUB_REF"]
+    print(f"{ref=}")
+    matches = pattern.findall(ref)
     return int(matches[0])
 
 

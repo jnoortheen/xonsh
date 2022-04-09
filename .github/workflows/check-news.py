@@ -5,6 +5,7 @@ Put a warning comment if it doesn't.
 import os
 from github import Github, PullRequest
 from fnmatch import fnmatch
+import logging
 
 
 def get_added_files(pr: PullRequest.PullRequest):
@@ -42,17 +43,20 @@ def main():
     has_news_added = check_news_file(pr)
     old_comment = get_old_comment(pr)
 
+    if old_comment:
+        logging.info("Found an existing comment from bot")
+        if has_news_added:
+            logging.info("Delete warning from bot, since news items is added.")
+
     if (not has_news_added) and (not old_comment):
-        print("No news item found")
+        logging.info("No news item found")
 
         pr.create_issue_comment(
             """\
-**Warning!** No news item is found for this PR. 
+**Warning!** No news item is found for this PR.
 If this is an user facing change/feature/fix, please add a news item by copying the format from `news/TEMPLATE.rst`.
 """
         )
-    elif old_comment:
-        old_comment.delete()
 
 
 if __name__ == "__main__":

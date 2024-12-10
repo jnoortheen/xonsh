@@ -4,5 +4,9 @@
     "bump-minor-pre-major": true,
     "bump-patch-for-minor-pre-major": true,
     "include-v-in-tag": false,
-    "changelog-path": "changelog.rst"
+    "packages": {
+        ".": {
+            "changelog-path": "CHANGELOG.rst"
+        }
+    }
 }

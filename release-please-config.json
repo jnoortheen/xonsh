@@ -1,0 +1,10 @@
+{
+    "packages": {
+        ".": {
+            "changelog-path": "changelog.rst",
+            "release-type": "python",
+            "bump-minor-pre-major": true,
+            "bump-patch-for-minor-pre-major": true
+        }
+    }
+}

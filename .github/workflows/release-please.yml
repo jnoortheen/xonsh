@@ -13,6 +13,8 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
+      - name: run some command to generate a version.txt file
+        run: echo "1.0.0" > version.txt
       - uses: googleapis/release-please-action@v4
         with:
           config-file: release-please-config.json

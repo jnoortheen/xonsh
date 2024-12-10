@@ -7,7 +7,7 @@
     "bootstrap-sha": "655dd76ed11e63f3df82966632581480faf3964f",
     "packages": {
         ".": {
-            "changelog-path": "CHANGELOG.rst",
+            "changelog-path": "CHANGELOG.rst"
         }
     }
 }

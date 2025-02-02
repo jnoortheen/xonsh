@@ -1,5 +1,20 @@
 # Xonsh Change Log
 
+## [0.19.1](https://github.com/jnoortheen/xonsh/compare/0.19.0...0.19.1) (2025-02-02)
+
+
+### Features
+
+* add new Rust based parser ([8c79342](https://github.com/jnoortheen/xonsh/commit/8c79342e65ba10ec13bb7181d20646352d04f967))
+* add release-please for conventional-commit based releases ([8a0b315](https://github.com/jnoortheen/xonsh/commit/8a0b3156a4f2b2377fe0c43d210346557123a2ba))
+* **environ:** allow XONSH_*_DIR to be configurable ([#5783](https://github.com/jnoortheen/xonsh/issues/5783)) ([0292b43](https://github.com/jnoortheen/xonsh/commit/0292b43e64c72ef16a75128d6346ce7d3b316d66))
+
+
+### Bug Fixes
+
+* handle bg=True ([3d08842](https://github.com/jnoortheen/xonsh/commit/3d088428bb322ca0ba5c2e11f6bcda5bb1595661))
+* handle redirects and & ([7f49769](https://github.com/jnoortheen/xonsh/commit/7f49769e3ded45ab9d86e32ab61a61637c237013))
+
 ## v0.19.0
 
 **Added:**

@@ -1,6 +1,6 @@
 **Added:**
 
-* <news item>
+* env: Added XONSH_CONFIG_DIR, XONSH_DATA_DIR and XONSH_CACHE_DIR.
 
 **Changed:**
 
@@ -16,7 +16,7 @@
 
 **Fixed:**
 
-* Fixed non-int sys.exit codes raising ValueError.
+* <news item>
 
 **Security:**
 
